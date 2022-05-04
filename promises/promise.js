@@ -34,6 +34,18 @@ class MyPromise {
     executor(resolve, reject);
   }
 
+  static resolve(data) {
+    return new MyPromise((resolve, _reject) => {
+      resolve(data);
+    });
+  }
+
+  static reject(data) {
+    return new MyPromise((_resolve, reject) => {
+      reject(data);
+    });
+  }
+
   then(func) {
     if (this.isResolved) {
       this.resolvedData = func(this.resolvedData);
@@ -98,3 +110,6 @@ new MyPromise((resolve, reject) => {
   return err;
 })
 .finally(data => console.log(data));
+
+MyPromise.resolve(10).then(data => console.log(data));
+MyPromise.reject('Something went wrong').then(err => console.log(err));
