@@ -46,6 +46,24 @@ class MyPromise {
     });
   }
 
+  static all(promises) {
+    let count = 0;
+    const results = [];
+
+    return new MyPromise((resolve, reject) => {
+      promises.forEach((promise, index) => {
+        promise.then((data) => {
+          count += 1;
+          results[index] = data;
+          
+          if (count === promises.length) {
+            resolve(results);
+          }
+        }).catch(err => reject(err));
+      })
+    })
+  }
+
   then(func) {
     if (this.isResolved) {
       this.resolvedData = func(this.resolvedData);
@@ -113,3 +131,19 @@ new MyPromise((resolve, reject) => {
 
 MyPromise.resolve(10).then(data => console.log(data));
 MyPromise.reject('Something went wrong').then(err => console.log(err));
+
+MyPromise.all([Promise.resolve(10), Promise.resolve(20), Promise.resolve(30)]).then(data => {
+  console.log(data);
+});
+
+MyPromise.all([Promise.resolve(10), Promise.resolve(20), Promise.reject('Server error')]).then(data => {
+  console.log(data);
+}).catch(err => console.log(err));
+
+MyPromise.all([Promise.resolve(10), Promise.resolve(20), new Promise((resolve, _reject) => {
+  setTimeout(() => {
+    resolve(30);
+  }, 5000)
+})]).then(data => {
+  console.log(data);
+});
